@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#ffcc00">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Taxicheck">
+<title>Taxicheck</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&display=swap">
+<style>
+/* Layout: eine Spalte, Kopfband in Gelb, zwei große Umschalter, darunter die jeweilige Ansicht. Feste Gelb/Schwarz-Optik in beiden Themes. */
+:root{--bk:#111111;--bk2:#1d1d1b;--bk3:#2b2a26;--ye:#ffcc00;--ye2:#ffe066;--wh:#f6f3e8;--mu:#b9b39a;--ok:#1fa64a;--okbg:#0f3d1f;--no:#d9322b;--nobg:#4a1512;--display:'Barlow Condensed','Arial Narrow',Impact,sans-serif;--body:'Barlow',system-ui,-apple-system,'Segoe UI',sans-serif}
+*{box-sizing:border-box}
+html{color-scheme:dark}
+body{background:var(--bk);color:var(--wh);font-family:var(--body);font-size:16px;line-height:1.45;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 40px}
+.wrap{max-width:720px;margin:0 auto}
+header{background:var(--ye);color:var(--bk);margin-inline:calc(-1*max(16px,env(safe-area-inset-left,0px)));padding:18px max(16px,env(safe-area-inset-left,0px));border-bottom:6px solid var(--bk);background-image:repeating-linear-gradient(90deg,var(--bk) 0 18px,var(--ye) 18px 36px);background-size:100% 8px;background-repeat:no-repeat;background-position:bottom}
+header .in{max-width:720px;margin:0 auto;display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-bottom:6px}
+h1{font:800 clamp(34px,8vw,48px)/1 var(--display);letter-spacing:.02em;text-transform:uppercase;margin:0}
+header small{font:600 14px var(--display);letter-spacing:.14em;text-transform:uppercase;text-align:right}
+header .by{display:block;font-weight:700;letter-spacing:.08em;margin-top:2px;opacity:.8}
+.tab.k{grid-column:1/-1;min-height:52px;padding:12px 10px;font-size:clamp(16px,4vw,20px);border-width:2px;border-color:var(--mu);color:var(--mu)}
+.tab.k[aria-selected=true]{background:var(--ye);color:var(--bk);border-color:var(--ye)}
+.kfs{background:var(--bk2);border:2px solid var(--bk3);padding:18px 16px;margin-top:16px}
+.kfs h2{font:800 30px/1 var(--display);text-transform:uppercase;margin:0 0 12px;letter-spacing:.03em}
+.kit{display:flex;gap:10px;align-items:center;border-bottom:1px solid var(--bk3);padding:8px 0;flex-wrap:wrap}
+.kit b{font:800 24px var(--display);min-width:56px}
+.kit span{flex:1 1 160px;min-width:0}
+.kit button{background:none;border:2px solid var(--no);color:#ff7d76;font:600 14px var(--display);letter-spacing:.08em;text-transform:uppercase;padding:6px 10px;cursor:pointer}
+.kit button.sure{background:var(--no);color:#fff}
+.kit button.ed{border-color:var(--mu);color:var(--wh)}
+.err{color:#ff7d76;margin-top:10px;min-height:22px}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:22px}
+.tab{font:700 clamp(18px,4.6vw,24px)/1.1 var(--display);letter-spacing:.05em;text-transform:uppercase;border:3px solid var(--ye);background:var(--bk);color:var(--ye);padding:18px 10px;cursor:pointer;min-height:64px}
+.tab[aria-selected=true]{background:var(--ye);color:var(--bk)}
+:focus-visible{outline:3px solid var(--ye2);outline-offset:3px}
+section{margin-top:24px}
+label,.lab{display:block;font:600 14px var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--ye);margin-bottom:6px}
+input[type=text],input[type=number],input[type=search],textarea{width:100%;background:var(--bk2);color:var(--wh);border:2px solid var(--bk3);border-bottom-color:var(--ye);padding:12px;font:500 18px var(--body);border-radius:0}
+input::placeholder,textarea::placeholder{color:#7d7863}
+.row{display:flex;gap:10px}
+.row>*{min-width:0}
+#nr{font:800 36px var(--display);letter-spacing:.06em;flex:1}
+.go{background:var(--ye);color:var(--bk);border:0;font:800 24px var(--display);letter-spacing:.06em;text-transform:uppercase;padding:0 26px;cursor:pointer}
+.go:hover{background:var(--ye2)}
+.res{margin-top:18px;padding:22px 18px;border-left:12px solid;min-height:120px}
+.res.ok{background:var(--okbg);border-color:var(--ok)}
+.res.no{background:var(--nobg);border-color:var(--no)}
+.res.hint{background:var(--bk2);border-color:var(--bk3);color:var(--mu)}
+.res .big{font:800 clamp(34px,9vw,52px)/1 var(--display);text-transform:uppercase;letter-spacing:.03em}
+.res.ok .big{color:#5ee08a}.res.no .big{color:#ff7d76}
+.res .sub{margin-top:8px;font-size:18px}
+.res .sub b{font-weight:600}
+.count{color:var(--mu);font-size:14px;margin-top:14px}
+.form{background:var(--bk2);padding:18px 16px;border:2px solid var(--bk3)}
+.form h2{font:800 34px/1 var(--display);text-transform:uppercase;margin:0 0 2px;letter-spacing:.03em}
+.form .meta{color:var(--mu);font-size:14px;margin-bottom:14px}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.g.one{grid-template-columns:1fr}
+@media(max-width:520px){.g{grid-template-columns:1fr}}
+.fs{margin-top:20px;border-top:2px solid var(--ye);padding-top:10px}
+.fs h3{font:700 20px var(--display);letter-spacing:.1em;text-transform:uppercase;color:var(--ye);margin:0 0 6px}
+.chk{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--bk3);cursor:pointer;font-size:17px;flex-wrap:wrap}
+.chk input{width:26px;height:26px;accent-color:var(--ye);flex:none}
+.chk .t{flex:1 1 200px;min-width:0}
+.yn{display:flex;gap:8px}
+.yn label{margin:0;display:flex;align-items:center;gap:6px;font:600 18px var(--body);letter-spacing:0;text-transform:none;color:var(--wh);padding:6px 12px;border:2px solid var(--bk3);cursor:pointer}
+.yn input{accent-color:var(--ye);width:20px;height:20px}
+.inl{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0 0 38px}
+.inl input{flex:1 1 120px}
+.btns{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:22px}
+.btn{font:700 20px var(--display);letter-spacing:.06em;text-transform:uppercase;padding:15px 10px;border:3px solid var(--ye);background:var(--bk);color:var(--ye);cursor:pointer;text-align:center;text-decoration:none;display:block}
+.btn.p{background:var(--ye);color:var(--bk)}
+.btn.wa{border-color:#25d366;color:#25d366}
+.btn:hover{filter:brightness(1.15)}
+.msg{margin-top:12px;color:var(--ye2);min-height:22px;font-weight:500}
+.saved{margin-top:30px}
+.saved h3{font:700 20px var(--display);letter-spacing:.1em;text-transform:uppercase;color:var(--ye);margin:0 0 8px}
+.it{display:flex;gap:10px;align-items:center;justify-content:space-between;background:var(--bk2);border-left:6px solid var(--ye);padding:10px 12px;margin-bottom:8px;flex-wrap:wrap}
+.it span{min-width:0;flex:1 1 180px}
+.it button{background:none;border:2px solid var(--mu);color:var(--wh);font:600 14px var(--display);letter-spacing:.08em;text-transform:uppercase;padding:6px 10px;cursor:pointer}
+.empty{color:var(--mu)}
+button,a,label{touch-action:manipulation;-webkit-tap-highlight-color:rgba(255,204,0,.25)}
+.res .num{font:600 18px var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--wh);opacity:.85;margin-bottom:6px}
+.res .big,.res .sub{overflow-wrap:break-word}
+.res .big{font-size:clamp(26px,7vw,52px);letter-spacing:0}
+label.chk,.chk{font:500 17px/1.3 var(--body);letter-spacing:0;text-transform:none;color:var(--wh);margin:0}
+.chk .t{overflow-wrap:break-word}
+.form h2{font-size:clamp(28px,8vw,34px)}
+@media(max-width:480px){
+#qf{flex-direction:column}
+#qf .go{padding:14px;font-size:24px;min-height:56px}
+#nr{font-size:34px;flex:none;width:100%}
+.tab{letter-spacing:.02em;padding:14px 4px;font-size:clamp(15px,4.6vw,20px)}
+header .in{align-items:flex-end}
+header small{font-size:12px;text-align:left}
+.res{padding:16px 14px;border-left-width:10px}
+.form{padding:14px 12px}
+.inl{margin-left:0}
+.chk{gap:10px}
+.kfs{padding:14px 12px}
+.kit b{min-width:48px}
+.btns{grid-template-columns:1fr 1fr}
+}
+</style>
+<style>html,body{margin:0}body{-webkit-text-size-adjust:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<div class="wrap">
+<header><div class="in"><h1>Taxicheck</h1><small>TAZ Stuttgart<span class="by">by Danis</span></small></div></header>
+<div class="tabs" role="tablist">
+<button class="tab" role="tab" id="t1" aria-selected="true" aria-controls="p1">Abfrage</button>
+<button class="tab" role="tab" id="t2" aria-selected="false" aria-controls="p2">Anzeigeformular</button>
+<button class="tab k" role="tab" id="t3" aria-selected="false" aria-controls="p3">Korrektur (Passwort)</button>
+</div>
+
+<section id="p1" role="tabpanel" aria-labelledby="t1">
+<label for="nr">Taxinummer</label>
+<form class="row" id="qf" action="javascript:void(0)"><input id="nr" type="text" inputmode="numeric" pattern="[0-9]*" enterkeyhint="search" autocomplete="off" placeholder="z. B. 953" maxlength="6"><button class="go" id="abf" type="submit">Abfrage</button></form>
+<div class="res hint" id="res" aria-live="polite"><div class="big">Taxinummer eingeben</div><div class="sub">Grün bedeutet angeschlossen, rot bedeutet nicht angeschlossen.</div></div>
+<div class="count" id="cnt"></div>
+</section>
+
+<section id="p2" role="tabpanel" aria-labelledby="t2" hidden>
+<form class="form" id="f" autocomplete="off">
+<h2>Taxi-Kontrolle</h2>
+<div class="meta">Formular der Taxi-Auto-Zentrale Stuttgart</div>
+<div class="g one"><div><label for="platz">am Taxiplatz</label><input type="text" id="platz" data-k="Taxiplatz"></div></div>
+<div class="g"><div><label for="dat">Datum</label><input type="text" id="dat" data-k="Datum"></div><div><label for="uhr">Uhrzeit</label><input type="text" id="uhr" data-k="Uhrzeit"></div></div>
+<div class="g"><div><label for="tnr">Taxi-Nr.</label><input type="text" id="tnr" inputmode="numeric" data-k="Taxi-Nr."></div><div><label for="tbk">TBK Nr.</label><input type="text" id="tbk" data-k="TBK Nr."></div></div>
+<div class="g one"><div><label for="kfz">Kfz.-Kennzeichen</label><input type="text" id="kfz" data-k="Kfz.-Kennzeichen"></div></div>
+
+<div class="fs"><h3>Fahrer/in</h3>
+<div class="g"><div><label for="fn">Name</label><input type="text" id="fn" data-k="Fahrer Name"></div><div><label for="fv">Vorname</label><input type="text" id="fv" data-k="Fahrer Vorname"></div></div>
+<div class="chk" style="margin-top:8px"><span class="t">Funkberechtigung</span><div class="yn" data-yn="Funkberechtigung"></div></div>
+<label class="chk"><input type="checkbox" data-c="Fahrt nach … verweigert" id="vw"><span class="t">Fahrt verweigert</span></label>
+<div class="inl"><input type="text" id="vwz" placeholder="Fahrt nach …" data-k="Fahrt verweigert nach"></div>
+<div class="g one"><div><label for="kd">Kunde</label><input type="text" id="kd" data-k="Kunde"></div><div><label for="ka">Kundenadresse</label><input type="text" id="ka" data-k="Kundenadresse"></div></div>
+<label class="chk"><input type="checkbox" data-c="Parken am Taxiplatz" id="pk"><span class="t">Parken am Taxiplatz</span></label>
+<div class="inl"><input type="text" id="pv" placeholder="von" data-k="Parken von"><input type="text" id="pb" placeholder="bis" data-k="Parken bis"></div>
+<label class="chk"><input type="checkbox" data-c="Fahrer/in ist nicht angemessen gekleidet"><span class="t">Fahrer/in ist nicht angemessen gekleidet</span></label>
+<label class="chk"><input type="checkbox" data-c="Fahrer/in ist nicht hilfsbereit"><span class="t">Fahrer/in ist nicht hilfsbereit</span></label>
+<label class="chk"><input type="checkbox" data-c="Fahrer/in hilft nicht beim Gepäck einladen"><span class="t">Fahrer/in hilft nicht beim Gepäck einladen</span></label>
+</div>
+
+<div class="fs"><h3>Fahrzeug</h3>
+<div class="chk"><span class="t">Fahrzeug schmutzig</span><label style="display:flex;gap:8px;align-items:center;margin:0;font:600 18px var(--body);text-transform:none;letter-spacing:0;color:var(--wh)"><input type="checkbox" data-c="Fahrzeug schmutzig außen" style="width:26px;height:26px">außen</label><label style="display:flex;gap:8px;align-items:center;margin:0;font:600 18px var(--body);text-transform:none;letter-spacing:0;color:var(--wh)"><input type="checkbox" data-c="Fahrzeug schmutzig innen" style="width:26px;height:26px">innen</label></div>
+<label class="chk"><input type="checkbox" data-c="Ordnungsnummer nicht lesbar / falsch angebracht"><span class="t">Ordnungsnummer nicht lesbar / falsch angebracht</span></label>
+<label class="chk"><input type="checkbox" data-c="Unternehmeranschrift nicht vorhanden"><span class="t">Unternehmeranschrift nicht vorhanden</span></label>
+<label class="chk"><input type="checkbox" data-c="Geeignetes Kartenmaterial fehlt"><span class="t">geeignetes Kartenmaterial fehlt</span></label>
+<label class="chk"><input type="checkbox" data-c="Taxiordnung / Tarif / Betriebsordnung fehlt"><span class="t">Taxiordnung / Tarif / Betriebsordnung fehlt</span></label>
+<div class="chk"><span class="t">Auf der Quittung fehlt</span><label style="display:flex;gap:8px;align-items:center;margin:0;font:600 18px var(--body);text-transform:none;letter-spacing:0;color:var(--wh)"><input type="checkbox" data-c="Quittung: Taxinummer fehlt" style="width:26px;height:26px">Taxinummer</label><label style="display:flex;gap:8px;align-items:center;margin:0;font:600 18px var(--body);text-transform:none;letter-spacing:0;color:var(--wh)"><input type="checkbox" data-c="Quittung: Stempel fehlt" style="width:26px;height:26px">Stempel</label></div>
+</div>
+
+<div class="fs"><h3>Werbung</h3>
+<div class="chk"><span class="t">Karosseriebeklebung vollständig</span><div class="yn" data-yn="Karosseriebeklebung vollständig"></div></div>
+<div class="chk"><span class="t">Radkappen vollständig</span><div class="yn" data-yn="Radkappen vollständig"></div></div>
+<div class="chk"><span class="t">Kopfstützen komplett und sauber</span><div class="yn" data-yn="Kopfstützen komplett und sauber"></div></div>
+</div>
+
+<div class="fs"><h3>Ergebnis</h3>
+<label class="chk"><input type="checkbox" data-c="Belehrung ist erfolgt / wird erfolgen"><span class="t">Belehrung ist erfolgt / wird erfolgen</span></label>
+<label class="chk"><input type="checkbox" data-c="Fahrer/Fahrzeug ohne Beanstandung"><span class="t">Fahrer/Fahrzeug ohne Beanstandung</span></label>
+<div class="g one"><div><label for="bem">Bemerkungen</label><textarea id="bem" rows="3" data-k="Bemerkungen"></textarea></div></div>
+</div>
+
+<div class="fs"><h3>Kontrolleure</h3>
+<div class="g"><div><label for="k1n">Name</label><input type="text" id="k1n" data-k="Kontrolleur 1 Name"></div><div><label for="k2n">Name</label><input type="text" id="k2n" data-k="Kontrolleur 2 Name"></div>
+<div><label for="k1t">Taxi-Nr.</label><input type="text" id="k1t" data-k="Kontrolleur 1 Taxi-Nr."></div><div><label for="k2t">Taxi-Nr.</label><input type="text" id="k2t" data-k="Kontrolleur 2 Taxi-Nr."></div>
+<div><label for="k1u">Unterschrift</label><input type="text" id="k1u" data-k="Kontrolleur 1 Unterschrift"></div><div><label for="k2u">Unterschrift</label><input type="text" id="k2u" data-k="Kontrolleur 2 Unterschrift"></div></div>
+<div class="g one"><div><label for="zg">Zeugen</label><input type="text" id="zg" data-k="Zeugen"></div></div>
+</div>
+
+<div class="btns">
+<button class="btn p" type="button" id="sv">Speichern</button>
+<a class="btn wa" id="wa" href="#" target="_blank" rel="noopener">WhatsApp</a>
+<a class="btn" id="ml" href="#">E-Mail</a>
+<button class="btn" type="button" id="cp">Kopieren</button>
+<button class="btn" type="button" id="nw">Neu</button>
+</div>
+<div class="msg" id="msg" aria-live="polite"></div>
+<div class="count">E-Mail-Versand an anhoerungen@taxi-auto-zentrale.de</div>
+</form>
+<div class="saved"><h3>Gespeicherte Kontrollen</h3><div id="lst"></div></div>
+</section>
+
+<section id="p3" role="tabpanel" aria-labelledby="t3" hidden>
+<div class="kfs" id="lock">
+<h2>Korrektur</h2>
+<label for="pw">Passwort</label>
+<div class="row"><input id="pw" type="password" autocomplete="off"><button class="go" id="unl" type="button">Öffnen</button></div>
+<div class="err" id="perr" aria-live="polite"></div>
+</div>
+<div id="adm" hidden>
+<div class="kfs">
+<h2>Fahrzeug hinzufügen</h2>
+<div class="g"><div><label for="an">Taxinummer</label><input type="text" id="an" inputmode="numeric"></div><div><label for="ak">Kennzeichen</label><input type="text" id="ak"></div></div>
+<div class="g one"><div><label for="at">Fahrzeugtyp</label><input type="text" id="at"></div></div>
+<div class="btns"><button class="btn p" type="button" id="aadd">Hinzufügen</button><button class="btn" type="button" id="alock">Sperren</button></div>
+<div class="msg" id="amsg" aria-live="polite"></div>
+</div>
+<div class="kfs">
+<h2>Fahrzeuge</h2>
+<label for="asr">Suchen</label>
+<input type="search" id="asr" placeholder="Taxinummer, Kennzeichen oder Typ">
+<div class="count" id="acnt"></div>
+<div id="alst"></div>
+<div class="btns"><button class="btn" type="button" id="arst">Originalliste wiederherstellen</button></div>
+</div>
+</div>
+</section>
+</div>
+<script>
+const V=[[201,"ES-EA 6901","MB E-Klasse"],[202,"ES-EA 6902","Toyota Corolla Hybrid"],[203,"ES-EA 6903","MB E-Klasse 212 Limousine"],[204,"ES-EA 6904","MB E-Klasse"],[205,"ES-EA 6905","Nissan Townstar"],[206,"ES-EA 6906","MB E-Klasse"],[207,"ES-EA 6907","MB E-Klasse"],[208,"ES-EA 6908","Toyota Corolla Hybrid"],[209,"ES-EA 6909","MB E-Klasse"],[210,"ES-EA 6910","Nissan X Trail"],[211,"ES-AF 1200","Toyota RAV 4 Hybrid"],[213,"ES-TX 213","VW Touran"],[215,"ES-TX 6868","MB E-Klasse 213"],[216,"ES-AT 216","Skoda"],[217,"ES-FZ 2004","VW Touran"],[218,"ES-SL 218","VW Touran"],[219,"ES-SE 219","VW Touran"],[220,"ES-LI 220","VW Touran"],[221,"ES-TX 221","VW Touran"],[222,"ES-XN 9068","MB E-Klasse 212"],[223,"ES-TX 223","VW Touran"],[226,"ES-CY 6262","MB E-Klasse"],[228,"ES-JC 73","MB E-Klasse"],[229,"ES-TX 229","VW Touran"],[230,"ES-TS 1102","Ford Galaxy"],[241,"ES-EA 6911","MB E-Klasse"],[242,"ES- EA 6912","MB E-Klasse"],[243,"ES-TP 243","VW Passat"],[244,"ES-FM 3031","VW Touran"],[245,"ES-M 3031","VW Touran"],[246,"ES-KA 246","VW Touran"],[247,"ES-EA 6900","Toyota Corolla"],[249,"ES-XS 9692","MB E-Klasse"],[250,"ES-NH 250","MB E-Klasse 214"],[251,"ES-KT 66","Seat Alhambra"],[252,"ES-TX 252","VW Touran"],[253,"ES-ER 8592","MB E-Klasse"],[254,"ES-NC 68","Tesla"],[255,"ES-CH 1968","VW Touran"],[256,"ES-G 3031","VW Touran"],[257,"ES-TX 257","VW Touran"],[258,"ES-XS 5189","VW Touran"],[261,"S-AR 1921","MB E-Klasse 214"],[262,"ES-KM 786","VW Touran"],[263,"EZ-QZ 7007","MB E-Klasse Limousine"],[264,"ES-TX 264","VW Touran"],[265,"ES-QN 804","Toyota RAV4"],[266,"S-TQ 777","Toyota RAV 4"],[267,"ES-UL 7000","Toyota RAV 4"],[268,"ES-AY 1414","VW Touran"],[269,"ES-HX 777","Toyota Prius Plus"],[270,"ES-TX 1984","MB Vito"],[271,"ES-AS 1920","Toyota RAV 4"],[273,"ES-XF 3500","MB E-Klasse"],[274,"ES-CR 7848","MB E-Klasse 220 D"],[275,"ES-PM 275","MB B-Klasse"],[276,"ES-TH 276","Toyota Prius Plus"],[278,"ES-B 9667 E","BYD Seal U Dmi"],[279,"ES-DS 3031","VW Touran"],[280,"ES-ON 15","Toyota Prius Plus"],[281,"ES-TX 222","MB E-Klasse"],[282,"ES-NE 3001","MB E-Klasse"],[283,"ES-BT 5454","VW Touran"],[302,"S-RN 2805","MB E-Klasse"],[303,"S-ZY 62","Mitsubishi Outlander Hybrid"],[304,"S-GG 6642","VW Touran"],[305,"S-TC 305","Volvo V90"],[306,"S-CD 306","MB B-Klasse"],[307,"S-TX 307","VW Touran"],[308,"S-GA 1313","Toyota RAV 4 Hybrid"],[309,"S-ZI 786","MB E-Klasse"],[310,"S-IQ 310","VW Touran"],[311,"S-DK 5757","MB E-Klasse 213 Limousine"],[312,"S-BH 4444","Toyota Corolla Hybrid"],[313,"S-EL 6262","MB E-Klasse"],[314,"S-MH 314","BYD"],[317,"S-AJ 6295","VW Touran"],[318,"S-HP 440 E","Mitsubishi Eclypse Hybrid"],[320,"S-OQ 1340","MB E-Klasse 220 D"],[321,"S-TX 321","VW Touran"],[323,"S-BI 15","Toyota Prius Plus"],[324,"S-ES 142","VW Touran"],[325,"S-OV 4786","Nissan X Trail Style"],[326,"S-SK 326","Toyota RAV 4 Hybrid"],[327,"S-TR 3807","Toyota Prius Plus"],[328,"S-XC 328","Toyota Camry Hybrid"],[329,"S-TX 329","MB E-Klasse"],[330,"S-TX2929","Toyota Corolla"],[331,"S-PA 8001","VW Touran"],[332,"S-UK 2402","Toyota Corolla"],[334,"S-SQ 334","MB E-Klasse"],[335,"S-DD 362","Toyota Prius Plus"],[337,"S-XC 3370","VW Touran"],[338,"S-AA 9200","Toyota RAV 4 Hybrid"],[342,"S-TX 342","VW Touran"],[343,"S-WG 343","MB V-Klasse"],[344,"S-OQ 1234","MB E-Klasse Limousine"],[345,"S-OT 6131","MB E-Klasse"],[346,"S-PK 346","Toyota Prius Plus"],[347,"S-BQ 8888","BYD SEAL-U"],[348,"S-CV 2112","Toyota Camry Hybrid"],[349,"S-EE 349","MB E-Klasse 220"],[350,"S-UG 68","VW Touran"],[351,"S-SB 351","Toyota RAV 4 Hybrid"],[352,"S-PA 8007","VW Touran"],[353,"S-GW 1206","Toyota RAV 4 Hybrid"],[354,"S-TX 354","MB E-Klasse"],[355,"S-AJ 4444","Toyota RAV4 Hybrid"],[356,"S-ZE 690","VW Touran Grau"],[358,"S-XC 3580","Toyota RAV 4 Hybrid"],[359,"S-TB 359","Toyota Corolla"],[360,"S-HC 1964","Kia Sportage"],[362,"S-HU 786","Toyota RAV 4 Hybrid"],[363,"S-TX 6363","MB E-Klasse Kombi"],[364,"S-TT 6969","Toyota"],[365,"S-PA 2617","VW Touran"],[366,"S-HR 1313","VW Touran"],[368,"S-GG 1768","Toyota Prius Plus"],[369,"S-VR 369","VW Passat"],[370,"S- AK 370","MB E-Klasse"],[372,"S-AH 349","VW Touran"],[373,"S-RS 6129","Seat Tarraco"],[375,"S-AA 7914","MB-Eklasse"],[377,"S-OO 3310","VW TOURAN"],[379,"S-XS 382","VW Touran"],[381,"S-HS 381","VW Touran"],[382,"S-GX 48","MB E-Klasse 213"],[383,"S-EA 1977","VW Touran"],[384,"S-OZ 1588","MB B-Klasse"],[385,"S-TX 385","VW Touran"],[386,"S-OT 8320","Toyota Prius Plus"],[387,"S-TX 387","VW Touran"],[388,"S-PL 1003","VW Touran"],[390,"S-GG 390","VW Touran"],[391,"S-G 3435","Volvo V90"],[392,"S-PQ 4390","Toyota RAV 4 Hybrid"],[394,"S-AN 1981","MB E-Klasse 213"],[395,"S-FB 28","Toyota Prius Plus"],[396,"S-CZ 15","Toyota RAV 4 Hybrid"],[398,"S-DO 398","Toyota Prius Plus"],[400,"S-OY 1208","MB S-Klasse Limousine"],[401,"S-OO 3200","VW Touran"],[402,"S-TX 402","MB E-Klasse 212"],[403,"S-XA 403","VW Tayron"],[404,"S-WW 404","MB GLC"],[405,"S-ES 9804","Toyota Corolla"],[406,"S-AS 3131","VW Sharan"],[407,"S-TX 1905","MB E-Klasse"],[408,"S-TX 1907","Kia Sorento"],[409,"S-PA 8010","VW Touran"],[410,"S-HZ 2203","MB T-Klasse"],[412,"S-KH 412","VW Touran"],[414,"S-VK 93","MB E-Klasse"],[416,"S-J 4160","Mitsubishi Outlander Hybrid"],[417,"S-OG 417","MB S-Klasse"],[418,"S-YH 124","MB E-Klasse"],[419,"S-RO 1999","VW Touran"],[420,"S-KK 420","MB E-Klasse"],[421,"S-OP 2039","VW Touran"],[422,"S-KT 422","Toyota Corolla"],[423,"S-BL 777","Toyota Corolla Hybrid"],[425,"S-KT 425","MB E-Klasse Limousine"],[426,"S-QQ 426","MB E-Klasse 200 Limousine"],[427,"S-SG 427","VW Touran"],[428,"S-KC 800","MB E-Klasse Limousine"],[429,"S-AK 429","MB E-Klasse"],[430,"S-XO 1050","Toyota RAV 4"],[431,"S-ME 431","VW Touran"],[432,"S-AM 3830","Audi A8"],[433,"S-KB 433","MB E-Klasse 212"],[435,"S-BS 435","VW Touran"],[436,"S-TG 66","VW Touran"],[438,"S-TX 1903","MB E-Klasse"],[439,"S-PO 1863","VW Touran"],[440,"S-BY 440","MB E-Klasse"],[441,"S-NA 441","VW ID Buzz"],[442,"S-OO 3164","VW Caddy"],[445,"S-NB 3737","MB E-Klasse"],[446,"S-LP 15","Toyota Prius Plus"],[448,"S-MA 7677","Toyota RAV 4"],[449,"S-HA 2517","VW Touran"],[450,"S-AL 1009","Volvo XC 60"],[451,"S-MS 4925","Toyota Prius Plus"],[452,"S-QP 1013","VW Touran"],[453,"S-MT 1453","VW Touran"],[454,"S-FC 6868","Ford Tourer"],[457,"S-JA 408","MB E-Klasse 212"],[459,"S-FC 990","MBE Limousine"],[461,"S-KT 9496","Toyota RAV 4 Hybrid"],[462,"S-BX 6868","Toyota Prius"],[465,"S-MO 6603","VW Caddy Maxi"],[469,"S-MM 5775","Toyota Prius Plus"],[470,"S-YK 6262","Toyota Prius Plus"],[471,"S-QS 786","MB S-Klasse"],[472,"S-TX 472","MB E-Klasse"],[473,"S-EK 473","MB E-Klasse Limousine"],[474,"S-TX 100 E","Mitsubishi Eclipse Cross"],[475,"S-XC 4750","Toyota RAV 4 Hybrid"],[476,"S-TX 476 E","Toyota bZ4X"],[477,"S-GE 70","VW Caddy"],[478,"S-HF 6871","MB B-Klasse"],[479,"S-BS 1727","Toyota Camry Hybrid"],[480,"S-IQ 62","MB E-Klasse"],[481,"S-MM 481","VW Touran"],[482,"S-HY 606","VW Touran"],[483,"S-TH 483","VW Touran"],[484,"S-YE 484","VW Touran"],[485,"S-XC 485","Toyota RAV 4 Hybrid"],[486,"S-DD 486","VW Touran"],[487,"S-FH 487","VW Caddy"],[488,"S-HL 488E","BYD"],[489,"S-SZ 5858","MB E-Klasse"],[490,"S-SU 571","Toyota Prius Plus"],[491,"S-TX 491","Toyota Corolla Hybrid"],[492,"S-KD 492","Hyundai Staria"],[493,"S-ES 719 E","MB GLC"],[494,"S-MK 8788","VW Touran"],[496,"S-RD 851","MB E-Klasse"],[497,"S-DK 5700","MB E-Klasse"],[498,"S-PA 1162","VW Touran"],[499,"S-TX 6161","MB E-Klasse"],[500,"S-ZB 500","MB E-Klasse"],[501,"S-MK 6295","VW Touran"],[502,"S-NA 7615","VW Touran"],[503,"S-AR 503","MB E-Klasse"],[504,"S-SB 1907 E","BYD Seal-U"],[506,"S-OK 5064","MB E-Klasse 213"],[507,"S-YM 47","VW Touran"],[508,"S-GY 2808","BYD SA3"],[509,"S-RN 66","MB E-Klasse"],[510,"S-KD 9893","MB E-Klasse 212 Limousine"],[511,"S-XI-511","MB E-Klasse"],[512,"S-U 8181","Toyota RAV 4 Hybrid"],[513,"S-GT 128","AUDI A8"],[515,"S-TH 544","VW Touran"],[516,"S-AA 3604","VW Touran"],[517,"S-GG 1071","Toyota Prius Plus"],[518,"S-OH-2745","MB E-Klasse 213 kombi"],[519,"S-GX 15","Toyota Prius Plus"],[522,"S-RM 121","MB E-Klasse"],[523,"S-SG 523","Toyota RAV 4 Hybrid"],[524,"S-EE 1440","Volvo V90"],[525,"S-DM 1721","Audi A6 Avant"],[526,"S-AO 1907","Toyota Corolla Cross"],[527,"S-KR 1313","MB E-Klasse"],[529,"S-OB 5528","Toyota Corolla Cross"],[530,"S-AE 6640","MB E-Klasse Limousine"],[534,"S-PK 1511","VW Touran"],[536,"S-IG 536","Toyota RAV 4 Hybrid"],[537,"S-PA 2158","VW Touran"],[538,"S-BT 2585","Suzuki Swace"],[539,"S-SV 539","Toyota Corolla"],[541,"S-LM 6969 E","BYD"],[542,"S-K 2929","Toyota Camry Hybrid"],[543,"S-DF 2003","MB E-Klasse"],[545,"S-OH 545","VW Touran"],[546,"S-SC 1047","MB E-Klasse 200 D"],[547,"S-CK 1547","MB E-Klasse"],[548,"S-YA 6868","Toyota Prius Plus"],[549,"S-DR 549","MB E-Klasse 2025"],[550,"S-KK 2016 E","Mitsubishi Eclipse"],[551,"S-MY 551","MB E-Klasse"],[552,"S-BR 552","Toyota RAV 4 Hybrid"],[553,"S-AA 3553","Toyota RAV4"],[554,"S-OX 3096","Toyota Prius Plus"],[556,"S-LL 7975","MB E-Klasse"],[557,"S-MK 1819","VW Touran"],[558,"S-PM 418","VW"],[559,"S-QD 62","MB Vito"],[560,"S-VZ 560","MB E-Klasse"],[561,"S-HD 561","VW Touran"],[562,"S-EC 13","BYD Seal SUV"],[564,"S-ZA 564","MB E-Klasse 214 Limousine"],[565,"S-SB 2003","Toyota RAV4 Hybrid"],[567,"S-TX 567","VW Caddy Maxi"],[568,"S-TR 25","Peugeot 5008"],[569,"S-Z 786","Nissan X Trail"],[570,"S-AH 1222","Toyota Camry"],[571,"S-KO 15","Toyota Prius Plus"],[572,"S-KL 572","MB E-Klasse"],[573,"S-XM 1984","MB B-Klasse"],[574,"S-XS 381","VW Touran"],[575,"S-YT 6977","Toyota Camry"],[576,"S-F 1990 E","BYD Seal"],[577,"S-XS 384","VW Touran"],[578,"S-XC 578","VW Touran"],[580,"S-SB 580","Toyota Prius Plus"],[581,"S-OI 581","VW Touran"],[582,"S-OA 5353E","Mitsubishi Outlander Hybrid"],[583,"S-OP 1436","VW Touran"],[584,"S-PA 2618","VW Touran"],[585,"S-GG 1568","Toyota Prius Plus"],[586,"S-HM 586","MB E-Klasse"],[587,"S-TC 5050","MB E-Klasse"],[588,"S-TT 2813","Toyota ZVW 40"],[589,"S-CT 589 E","BYD Seal-U"],[590,"S-GI 6969","MB E-Klasse"],[591,"S-TX 300","MB E-Klasse Limousine"],[592,"S-XS 380","VW Touran"],[593,"S-LM 6233","Toyota RAV 4 Hybrid"],[594,"S-YC 29","MB E-Klasse 212"],[595,"S-PX 6745","MB E-Klasse Limousine"],[596,"S-PW 596","VW Passat"],[597,"S-OY 1084","VW Tayron"],[598,"S-RM 1251","Toyota Corolla"],[599,"S-RT 15","Toyota Prius Plus"],[600,"S-OS 8627","MB E-Klasse"],[601,"S-MX 2727 E","GWM WEY 03"],[602,"S-EK 602","MB E-Klasse"],[603,"S-OZ 4320","Audi C4 Avant"],[604,"S-SV 5858","VW Touran"],[605,"S-HU 605E","Toyota BZ4X"],[606,"S-AS 606","Lexus"],[607,"S-GM 607","MB E-Klasse 212 Limousine"],[608,"S-LL 777","Toyota Corolla Hybrid"],[609,"S-AB 609","VW Caddy"],[610,"S-MH 610E","Mitsubishi Outlander"],[612,"S-RO 15","Toyota Prius Plus"],[613,"S-SZ 69","Opel Insignia"],[614,"S-CA 1997","MB E-Klasse 200 D"],[615,"S-GP 1006","MB E-Klasse"],[616,"S-OP 5025","VW Caddy"],[619,"S-ML 9517","VW Touran"],[621,"S-LS 621","Toyota Rav 4 Hybrid"],[622,"S-MO 6602","VW Caddy Maxi"],[624,"S-KR 1988","VW Touran"],[625,"S-IO 51","Lexus ES 300 h"],[626,"S-AV 626","Toyota Corolla"],[627,"S-HC 627","MB  E-Klasse"],[628,"S-QQ 6262","Toyota Auris Hybrid"],[629,"S-GS 1975","MB S-Klasse Limousine"],[630,"S-LP 1003","MB E-Klasse"],[631,"S-DB 631","MB E-Klasse 220"],[632,"S-AF 6365","Mercedes GLC"],[633,"S-RL 2003","Toyota RAV 4 Hybrid"],[634,"S-AA-260","BYD"],[635,"S-YA 24","Toyota RAV 4"],[636,"S-SK 636","MB E-Klasse"],[638,"S-AM 638","MB E-Klasse"],[642,"S-SI 3642","Volvo V90"],[644,"S-GG 1453","Toyota Prius Plus"],[645,"S-AF 2020","MB E-Klasse T-Modell Kombi"],[646,"S-NA 646","MB E-Klasse"],[647,"S-SP 5919 E","Mitsubishi Eclipse Cross"],[648,"S-AF 648","Toyota Corolla"],[649,"S-XC 649","VW Touran"],[650,"S-KY 650","MB E-Klasse"],[652,"S-KD 129","Mercedes V-Klasse"],[655,"S-BK 66","VW Tiguan"],[656,"S-IA 3406","Toyota Corolla Cross"],[657,"S-EM 5858","Ford Tourneo Custom"],[658,"S-HL 974","VW Touran"],[659,"S-WI 659","MB E-Klasse 213 Kombi"],[660,"S-SL 660","MB E-Klasse"],[662,"S-TC 2800","Dacia Duster"],[663,"S-KN 2307","MB E-Klasse"],[664,"S-GA 2010","VW Touran"],[665,"S-HK9520","MB E-Klasse"],[666,"S-PQ 2072","Toyota Corolla Hybrid"],[667,"S-BQ 62","MB E-Klasse"],[668,"S-XY 6262","Toyota RAV 4 Hybrid"],[670,"S-AC 786","Toyota RAV 4 Hybrid"],[671,"S-IQ 3033","VW Touran"],[672,"S-SB 672","Toyota Prius Plus"],[673,"S-TX 673 E","VOLVO X C90"],[675,"S-IQ 8393","MB E-Klasse"],[676,"S-LL 2913","Toyota RAV 4 Hybrid"],[677,"S-MZ 677","Toyota Corolla Hybrid"],[678,"S-KM 2807","Toyota Corolla Hybrid"],[679,"S-TX 679","Volvo S-90"],[680,"S-AS 6680","VW Touran"],[681,"S-XC 681","Toyota Corolla"],[682,"S-TX 31","MB E-Klasse 200 CDI"],[683,"S-OS 1116","MB B-Klasse"],[684,"S-MR 684","MB E-Klasse"],[685,"S-AF 684","Toyota Prius Plus"],[686,"S-TX 24","MB E-Klasse 213"],[687,"S-TX 687","VW Multivan T7"],[689,"S-AE 1461","VW Touran"],[690,"S-IA 6961","Toyota Corolla"],[691,"S-BT 130","MB E-Klasse"],[692,"S-XC 1692","Toyota RAV 4 Hybrid"],[693,"S-TX 693","VW Tiguan-Allspace"],[694,"S-TX 694","VW Touran"],[695,"S-MD 695","Volvo V 90 B4"],[697,"S-ET 2800","MB B-Klasse"],[698,"S-LL 7176","MB Vito"],[699,"S-SB 699","Kia Sportage"],[701,"S-MF 1167","Hyundai I-30 Kombi"],[703,"S-OC 9398","Toyota RAV 4 Hybrid"],[704,"S-TB 704","Toyota RAV 4 Hybrid"],[705,"S-YZ 2929","MB E-Klasse"],[707,"S-AY 2969","VW Passat"],[708,"S-AL 708","VW Caddy"],[709,"S-TC 7878","Toyota Camry Hybrid"],[710,"S-TC 480","MB E-Klasse"],[711,"S-PA 2391","VW Touran"],[712,"S-UA 712","Toyota Corolla"],[713,"S-MI 538","Toyota RAV 4 Hybrid"],[714,"S-AX 999","Mercedes-E Klasse"],[715,"S-HU 1965","MB E-Klasse 214"],[716,"S-LH 69","VW Touran"],[717,"S-AV 3003","MB E-Klasse"],[718,"S-HY 6334","VW Touran"],[719,"S-PQ 2073","Toyota Corolla Hybrid"],[720,"S-HS 2529","MB E-Klasse"],[721,"S-CJ 168","VW-Touran"],[722,"S-DD 722","MB S-Klasse Limousine"],[723,"S-OP 1318","VW Touran"],[724,"S-ZU 786","VW Touran"],[725,"S-SK 725","MB E-Klasse 220"],[727,"S-CI 1999","MB E-Klasse Limousine 220 D"],[728,"S-GL 728","Toyota Prius Plus"],[729,"S-OP 1784","VW Touran"],[730,"S-DD 730","Toyota Prius"],[733,"S-OE 1917","VOLVO S90"],[734,"S-NB 3437","MB E-Klasse"],[735,"S-OA 5240","MB E-Klasse"],[736,"S-HE 736","VW Touran"],[737,"S-LM 1971","Toyota RAV 4"],[738,"S-OY 3499","VW Caddy Maxi"],[740,"S-LH 77","MB E-Klasse"],[742,"S-HZ 888","Toyota RAV 4 Hybrid"],[744,"S-LL 744","MB E-Klasse"],[745,"S-TX 745","VW Touran"],[746,"S-AJ 786","Toyota Highlander"],[747,"S-LY 777","MB E-Klasse Kombi"],[748,"S-OY 5771","Toyota Corolla"],[749,"S-TX 749","Volkswagen VW"],[750,"S-MO 750","MB E-Klasse"],[751,"S-MG 2121","VW Touran"],[752,"S-GT 7520","MB E-Klasse 212 Limousine"],[753,"S-FT 753","MB E-Klasse"],[754,"S-MD 754E","BMW 530"],[755,"S-CX 2022","VW Caddy Maxi"],[758,"S-AF 2001","Toyota RAV 4 Hybrid"],[761,"S-OA 1070","Toyota RAV 4"],[762,"S-FC 770","MB E-Klasse"],[764,"S-AB 1408 E","BYD"],[767,"S-DB 767","MB E-Klasse L."],[769,"S-TX 1990","VW Touran"],[770,"S-AD 770","MB Vito 116 CDI"],[772,"S-JK 772","Toyota RAV4"],[773,"S-OK 1218 E","BYD"],[774,"S-IZ 571","VW Touran"],[775,"S-YC 412","VW Caddy"],[777,"S-NF 777","VW Touran"],[778,"S-PK 786","Toyota RAV 4 Hybrid"],[782,"S-AD 1915","VW Touran"],[783,"S-XS 383","VW-Touran"],[784,"S-TX 784","MB E-Klasse"],[785,"S-LH 3003","MBE S-Klasse"],[786,"S-NR 786","VW Touran"],[787,"S-KP 787","MB E-Klasse 200 Limousine"],[788,"S-PA 2132","VW Touran"],[789,"S-MY 538","Toyota Prius Plus"],[791,"S-ZM 29","Seat Alhambra"],[792,"S-SH 792","Toyota RAV 4 Hybrid"],[794,"S-RM 1439","MB E-Klasse"],[796,"S-RA 2609","Toyota Camry Hybrid"],[799,"S-FA 8486","Toyota RAV 4 Hybrid"],[800,"S-AR 6212","Mitsubishi Outlander"],[801,"S-KV 801","MB E-Klasse 212"],[802,"S-TX 802","VW Tiguan"],[803,"S-VR 2589","MB E-Klasse Kombi"],[805,"S-BA 1414","VW Touran"],[806,"S-TX 806","MB E-Klasse"],[807,"S-EE 6969","MB E-Klasse 220"],[808,"S-ON 7573","VW Touran"],[811,"S-QM 16","MB E-Klasse Limousine"],[812,"S-TW 812E","VW Passat"],[813,"S-CM 6262 E","BYD Seal"],[814,"S-AR 4421","Toyota RAV 4"],[815,"S-TX 815","VW Touran"],[816,"S-XC 816","VW Tiguan"],[817,"S-UV 817","MB E-Klasse Kombi"],[819,"S-OX 1426","Toyota Camry Hybrid"],[820,"S-FC 880","MB E-Klasse"],[821,"S-TX 2934","Toyota RAV 4 Hybrid"],[823,"S-PA  8005","VW Touran"],[825,"S-EE 1815","MB E-Klasse Kombi"],[826,"S-MB 8866","MB E-Klasse"],[827,"S-DD 827","MB S-Klasse"],[828,"S-PA 8002","VW Touran"],[829,"S-TG 2512","MB E-Klasse 212 Limousine"],[830,"S-OP 2045","VW Touran"],[831,"S-NM 5113","MB E-Klasse"],[832,"S-II 832","Toyota Corolla Hybrid"],[833,"S-OH 4948E","Mitsubishi Eclipse"],[834,"S-ZK 1991","MB E-Klasse"],[837,"S- AX 6868","Toyota Prius Plus"],[838,"S-DD 1962","MB E-Klasse 213"],[841,"S-TX 841","MB E-Klasse"],[842,"S-MN 842","VW Caddy"],[843,"S-SQ 843","Nissan X-Trail"],[845,"S-LA 845","VW Touran"],[846,"S-JK 1885","MB E-Klasse"],[847,"S-TA 7576","MB E-Klasse"],[848,"S-YO 592","MB E-Klasse 220"],[849,"S-BS 849","Toyota Prius"],[851,"S-KD 5151","Lexus ES 300"],[852,"S-TX 62","MB E-Klasse"],[854,"S-KK 1997","MB E-Klasse Limousine"],[855,"S-DS 6605","VW Caddy"],[857,"S-VY 5555","MB E-Klasse Kombi"],[858,"S-BS 858","Toyota Prius Plus"],[859,"S-PA 1670","VW Touran"],[860,"S-AA 178 E","GWM SUV"],[861,"S-EG 5858","MB E-Klasse"],[862,"S-TX 862 E","BYD"],[864,"S-FC 700","MB E-Klasse Limousine"],[867,"S-GS 4962","MB S-Klasse"],[868,"S-HA 9412","Toyota RAV 4"],[870,"S-LF 870","MB E-Klasse"],[872,"S-NC 872E","Mitsubishi Eclipse Cross"],[873,"S-SB 2001","VW Caddy Maxi"],[874,"S-VK 6262 E","Mercedes E Hybrid"],[876,"S-OP 1249","VW Touran"],[877,"S-SM 1652","Toyota Prius Plus"],[878,"S-MY 1313","Audi A6"],[879,"S-ZS 1604","Lexus NX 350 H"],[880,"S-DH 880","VW Touran"],[881,"S-NF 6371","Toyota RAV 4 Hybrid"],[882,"S-NR 300","Toyota RAV4 Hybrid"],[883,"S-IR 883","BYD Seal"],[884,"S-CH 9398","Toyota RAV 4 Hybrid"],[885,"S-OO 3077","VW Touran"],[886,"S-TX 222 E","Mitsubishi Outlander Hybrid"],[887,"S-OP 1788","VW Touran"],[888,"S-PZ 888","MB S-Klasse"],[889,"S-OP 2177","VW Touran"],[890,"S-PA 2202","VW Touran"],[891,"S-AS 891","VW Touran"],[893,"S-TR 3808","Toyota Prius Plus"],[894,"S-TX 894","MB E-Klasse Limousine"],[895,"S-OT 5500","MB E Klasse"],[896,"S-OP 1914","VW Touran"],[897,"S-OY 7088","Toyota Corolla"],[898,"S-GP 1003","VW Touran"],[900,"S-MK 2424","VW Touran"],[901,"S-PA 8003","VW Touran"],[903,"S-YY 903","Toyota RAV 4 Hybrid"],[904,"S-DA 2525","Suzuki Swace"],[905,"S-TX 905","MB E-Klasse 220"],[906,"S-YF 777","MB E-Klasse"],[907,"S-XI 907","MB E-Klasse 220"],[908,"S-DM 3000","Toyota Prius Plus"],[910,"S-NB 786","MB E-Klasse W 214"],[911,"S-AR 1035","VW Touran"],[912,"S-II 912","Toyota Corolla Hybrid"],[913,"S-YM 1071","MB E-Klasse"],[914,"S-HR 914","MB E-Klasse"],[915,"S-PW 915","Porsche Cayenne"],[916,"S-ML 3284","MB E-Klasse 212 Kombi"],[917,"S-KG 1971","MB B-Klasse"],[918,"S-YM 24","VW Touran"],[919,"S-AO 919","Toyota RAV 4 Hybrid"],[922,"S-IR 7766","Toyota Corolla"],[923,"S-XC 9230","Tuyota RAV 4 Hybrid"],[925,"S-TD 61","Opel Zafira"],[927,"S-OY 5015","MB E-Klasse"],[928,"S-TX 102 E","Mitsubishi Outlander"],[929,"S-MO 6601","MB Vito"],[931,"S-MW 5911","MB Vito"],[932,"S-RQ 15","Toyota Prius Plus"],[933,"S-LL 933","MB E-Klasse"],[934,"S-OQ 1224","MB E-Klasse 213"],[935,"S-KB 756","MB B-Klasse"],[936,"S-HS 1960","MB E-Klasse"],[937,"S-QP 1001","VW Touran"],[938,"S-DH 6224","VW Touran"],[939,"S-CN 939","BYD Seal"],[940,"S-WW 940","Volvo V 90"],[941,"S-GT 1819","MB E-Klasse Limousine"],[942,"S-RJ 15","Toyota Prius Plus"],[944,"S-AL 2486","Hyundai Staria"],[945,"S-XC 9450","Toyota Corolla"],[947,"S-OS 947","VW Touran"],[948,"S-ES 6363","Toyota RAV4"],[949,"S-OA 4312","Toyota Prius Plus"],[950,"S-EE 4248","Toyota RAV 4 Hybrid"],[951,"S-TR 5858","Toyota Corolla Hybrid"],[952,"S-JC 952","MB E-Klasse W214"],[953,"S-DA 953","Toyota Camry"],[954,"S-KK 954","MB E-Klasse"],[955,"S-PS 1715","Toyota Corolla Cross"],[957,"S-RW 957","VW Touran"],[958,"S-OT 6159","VW Caddy Maxi"],[959,"S-TA 959 E","Tesla Y"],[960,"S-AA 6601","MB V-Klasse"],[961,"S-PC 3765","Toyota Corolla Hybrid"],[962,"S-KL 44","MB GLC"],[963,"S-HC 963","Toyota RAV 4"],[964,"S-KA 8181","VW Touran"],[965,"S-FB 2907","MB E-Klasse 220 Limousine"],[966,"S-EM 966","Toyota RAV 4 Hybrid"],[967,"S-OS 9670","Volvo V90 Cross"],[968,"S-AN 9806","MB E-Klasse Limousine"],[969,"S-KP 969","MB E-Klasse Limousine"],[970,"S-ME 970","Toyota Corolla Cross"],[972,"S-OV 3060","Toyota RAV 4 Hybrid"],[973,"S-AR 573","VW Caddy Maxi"],[974,"S-LL 150","Toyota Rav 4"],[975,"S-UD 1956","MB E-Klasse 220 D"],[977,"S-HD 977","Ford Transit Connect Kombi"],[979,"S-XC 9790","Toyota Corolla"],[980,"S-AB 5252","Toyota RAV 4 Hybrid"],[981,"S-KG 2011","MB E-Klasse"],[982,"S-LL 6162","Volvo"],[983,"S-RK 983","MB E-Klasse"],[985,"S-OP 2179","VW Touran"],[986,"S-GS 986","MB E-Klasse"],[987,"S-EM 8289","Toyota RAV 4"],[988,"S-TX 988","Toyota Camry Hybrid"],[989,"S-TX 989","MB E-Klasse 212 Limousine"],[990,"S-NY 777","VW Touran"],[991,"S-VC 2802","MB E-Klasse Limousine"],[993,"S-MA 2012","MB E-Klasse"],[994,"S-KM 994E","GWM WEY 03"],[995,"S-TX 995","VW Touran"],[996,"S-OS 1431","MB E-Klasse 213"],[997,"S-YF 15","Toyota RAV4"],[998,"S-FK 1964","MB B-Klasse"],[999,"S-GG 1668","Toyota Prius Plus"],[1000,"S-XT 404","MB E-Klasse 200"],[1001,"ES-MC 9398","Toyota  RAV 4"],[1002,"S-KU 1991","MB E-Klasse W 213"],[1003,"S-R 1003","MB E-Klasse"],[1004,"S-AR 3321","MB C-Klasse"],[1006,"S-AP 654E","VW Passat"],[1007,"S-II 1007","Toyota Corolla"],[1008,"S-FQ 62","MB E-Klasse"],[1009,"S-TT 3429","Toyota Prius Plus"],[1010,"S-AS 5538","VW Touran"]];
+let M=new Map(),LIST=[];
+function load(){LIST=V.map(x=>x.slice());try{const s=JSON.parse(localStorage.getItem('taxicheck.fahrzeuge')||'null');if(Array.isArray(s))LIST=s}catch(e){}M=new Map(LIST.map(v=>[String(v[0]),v]));$('cnt').textContent=LIST.length+' Fahrzeuge in der Liste'}
+const $=id=>document.getElementById(id);
+function tab(n){for(const i of [1,2,3]){$('t'+i).setAttribute('aria-selected',i===n);$('p'+i).hidden=i!==n}}
+$('t1').onclick=()=>tab(1);$('t2').onclick=()=>{tab(2);if(!$('dat').value)stamp()};
+load();
+function abfrage(){
+  const raw=$('nr').value.trim(),r=$('res');
+  if(!raw){r.className='res hint';r.innerHTML='<div class="big">Taxinummer eingeben</div><div class="sub">Grün bedeutet angeschlossen, rot bedeutet nicht angeschlossen.</div>';return}
+  const k=raw.replace(/^0+/,'');
+  const v=M.get(k);
+  if(v){r.className='res ok';r.innerHTML='<div class="num">Taxinummer '+esc(k)+'</div><div class="big">Angeschlossen</div><div class="sub"><b>'+esc(v[1])+'</b> · '+esc(v[2])+'</div>'}
+  else{r.className='res no';r.innerHTML='<div class="num">Taxinummer '+esc(raw)+'</div><div class="big">Nicht angeschlossen</div><div class="sub">Diese Taxinummer steht nicht in der Liste der aktiven Fahrzeuge.</div>'}
+}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+$('qf').addEventListener('submit',e=>{e.preventDefault();abfrage();$('nr').blur();try{$('res').scrollIntoView({block:'nearest',behavior:'smooth'})}catch(_){}});
+$('nr').addEventListener('keydown',e=>{if(e.key==='Enter')abfrage()});
+$('nr').addEventListener('input',()=>{const v=$('nr').value.replace(/[^0-9]/g,'');if(v!==$('nr').value)$('nr').value=v;if(v.length===0||v.length>=3)abfrage()});
+// Ja/Nein
+document.querySelectorAll('[data-yn]').forEach((d,i)=>{const n='yn'+i;d.innerHTML=['Ja','Nein'].map(x=>'<label><input type="radio" name="'+n+'" value="'+x+'" data-ynk="'+esc(d.dataset.yn)+'">'+x+'</label>').join('')});
+function pad(n){return String(n).padStart(2,'0')}
+function stamp(){const d=new Date();$('dat').value=pad(d.getDate())+'.'+pad(d.getMonth()+1)+'.'+d.getFullYear();$('uhr').value=pad(d.getHours())+':'+pad(d.getMinutes())}
+function collect(){
+  const o={t:{},c:[],y:{}};
+  document.querySelectorAll('[data-k]').forEach(e=>{o.t[e.id]=e.value});
+  document.querySelectorAll('[data-c]').forEach((e,i)=>{if(e.checked)o.c.push(i)});
+  document.querySelectorAll('[data-ynk]').forEach(e=>{if(e.checked)o.y[e.dataset.ynk]=e.value});
+  return o;
+}
+function apply(o){
+  document.querySelectorAll('[data-k]').forEach(e=>{e.value=o.t[e.id]||''});
+  document.querySelectorAll('[data-c]').forEach((e,i)=>{e.checked=o.c.includes(i)});
+  document.querySelectorAll('[data-ynk]').forEach(e=>{e.checked=o.y[e.dataset.ynk]===e.value});
+}
+function text(o){
+  if(!o)o=collect();
+  const T=id=>(o.t[id]||'').trim();
+  const L=['TAXI-KONTROLLE – TAZ Stuttgart'];
+  const add=(l,id)=>{if(T(id))L.push(l+': '+T(id))};
+  add('Taxiplatz','platz');add('Datum','dat');add('Uhrzeit','uhr');add('Taxi-Nr.','tnr');add('TBK Nr.','tbk');add('Kfz.-Kennzeichen','kfz');
+  const nm=(T('fv')+' '+T('fn')).trim();if(nm)L.push('Fahrer/in: '+nm);
+  if(o.y['Funkberechtigung'])L.push('Funkberechtigung: '+o.y['Funkberechtigung']);
+  add('Kunde','kd');add('Kundenadresse','ka');
+  const cs=[...document.querySelectorAll('[data-c]')];
+  const ch=o.c.map(i=>cs[i].dataset.c);
+  const fix=ch.map(c=>{if(c.startsWith('Fahrt nach')&&T('vwz'))return 'Fahrt nach '+T('vwz')+' verweigert';if(c==='Parken am Taxiplatz'&&(T('pv')||T('pb')))return 'Parken am Taxiplatz von '+T('pv')+' bis '+T('pb');return c});
+  if(fix.length){L.push('');L.push('Beanstandungen / Angaben:');fix.forEach(c=>L.push('- '+c))}
+  const ys=Object.entries(o.y).filter(e=>e[0]!=='Funkberechtigung');
+  if(ys.length){L.push('');L.push('Werbung:');ys.forEach(e=>L.push('- '+e[0]+': '+e[1]))}
+  if(T('bem')){L.push('');L.push('Bemerkungen: '+T('bem'))}
+  const ks=[1,2].map(i=>['k'+i+'n','k'+i+'t','k'+i+'u'].map(T)).filter(a=>a.some(Boolean));
+  if(ks.length||T('zg')){L.push('');L.push('Kontrolleure:');ks.forEach(a=>L.push('- '+[a[0],a[1]&&'Taxi-Nr. '+a[1],a[2]&&'Unterschrift '+a[2]].filter(Boolean).join(', ')));if(T('zg'))L.push('Zeugen: '+T('zg'))}
+  return L.join('\n');
+}
+function title(o){const T=id=>(o.t[id]||'').trim();return 'Taxi-Kontrolle '+(T('tnr')?'Taxi '+T('tnr')+' ':'')+T('dat')}
+function links(){
+  const o=collect(),t=text(o);
+  $('wa').href='https://wa.me/?text='+encodeURIComponent(t);
+  $('ml').href='mailto:anhoerungen@taxi-auto-zentrale.de?subject='+encodeURIComponent(title(o))+'&body='+encodeURIComponent(t);
+}
+$('f').addEventListener('input',links);$('f').addEventListener('change',links);
+function say(m){$('msg').textContent=m}
+$('cp').onclick=async()=>{const t=text();try{await navigator.clipboard.writeText(t);say('Text kopiert.')}catch(e){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');say('Text kopiert.')}catch(_){say('Kopieren nicht möglich.')}a.remove()}};
+$('wa').addEventListener('click',()=>{links()});
+$('ml').addEventListener('click',()=>{links();say('E-Mail-Programm wird geöffnet. Falls nichts passiert, nutze Kopieren.')});
+// Speichern
+let store=[];
+try{store=JSON.parse(localStorage.getItem('taxicheck.kontrollen')||'[]')}catch(e){}
+function persist(){try{localStorage.setItem('taxicheck.kontrollen',JSON.stringify(store));return true}catch(e){return false}}
+function render(){
+  const l=$('lst');
+  if(!store.length){l.innerHTML='<div class="empty">Noch keine Kontrolle gespeichert.</div>';return}
+  l.innerHTML=store.map((s,i)=>'<div class="it"><span>'+esc(title(s.o))+'</span><button type="button" data-o="'+i+'">Öffnen</button><button type="button" data-d="'+i+'">Löschen</button></div>').join('');
+}
+$('lst').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.o!==undefined){apply(store[b.dataset.o].o);links();window.scrollTo(0,0);say('Kontrolle geöffnet.')}
+  if(b.dataset.d!==undefined){store.splice(b.dataset.d,1);persist();render()}
+});
+$('sv').onclick=()=>{store.unshift({o:collect()});const ok=persist();render();say(ok?'Gespeichert. Du findest die Kontrolle unten in der Liste.':'In der Liste abgelegt, aber der Browser speichert sie nicht dauerhaft. Teile oder kopiere sie.')};
+$('nw').onclick=()=>{apply({t:{},c:[],y:{}});stamp();links();say('Neues Formular.')};
+$('f').addEventListener('submit',e=>e.preventDefault());
+// Korrektur
+const PW='TAZ_2026';let open=false,sure=null;
+$('t3').onclick=()=>{tab(3)};
+function showAdm(){$('lock').hidden=open;$('adm').hidden=!open;if(open)alist()}
+function unlock(){if($('pw').value===PW){open=true;$('pw').value='';$('perr').textContent='';showAdm()}else{$('perr').textContent='Falsches Passwort.'}}
+$('unl').onclick=unlock;$('pw').addEventListener('keydown',e=>{if(e.key==='Enter')unlock()});
+$('alock').onclick=()=>{open=false;showAdm()};
+function saveL(){try{localStorage.setItem('taxicheck.fahrzeuge',JSON.stringify(LIST));return true}catch(e){return false}}
+function alist(){
+  const q=$('asr').value.trim().toLowerCase();
+  const f=LIST.filter(v=>!q||(v[0]+' '+v[1]+' '+v[2]).toLowerCase().includes(q));
+  $('acnt').textContent=f.length+' von '+LIST.length+' Fahrzeugen'+(f.length>60?' (die ersten 60 werden angezeigt)':'');
+  $('alst').innerHTML=f.slice(0,60).map(v=>'<div class="kit"><b>'+v[0]+'</b><span>'+esc(v[1])+' · '+esc(v[2])+'</span><button type="button" class="ed" data-e="'+v[0]+'">Bearbeiten</button><button type="button" data-x="'+v[0]+'" class="'+(sure==v[0]?'sure':'')+'">'+(sure==v[0]?'Wirklich löschen?':'Löschen')+'</button></div>').join('');
+}
+$('asr').addEventListener('input',()=>{sure=null;alist()});
+$('alst').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.e){const v=LIST.find(x=>String(x[0])===b.dataset.e);if(v){$('an').value=v[0];$('ak').value=v[1];$('at').value=v[2];$('amsg').textContent='Daten geladen. Ändern und Hinzufügen tippen, um zu speichern.';window.scrollTo(0,0)}}
+  if(b.dataset.x){if(sure==b.dataset.x){LIST=LIST.filter(x=>String(x[0])!==b.dataset.x);sure=null;saveL();load();$('amsg').textContent='Fahrzeug gelöscht.'}else sure=b.dataset.x;alist()}
+});
+$('an').addEventListener('input',()=>{$('an').value=$('an').value.replace(/[^0-9]/g,'')});
+$('aadd').onclick=()=>{
+  const n=parseInt($('an').value,10),k=$('ak').value.trim(),t=$('at').value.trim();
+  if(!n){$('amsg').textContent='Bitte eine Taxinummer eingeben.';return}
+  const i=LIST.findIndex(x=>x[0]===n);
+  if(i>=0)LIST[i]=[n,k,t];else LIST.push([n,k,t]);
+  LIST.sort((a,b)=>a[0]-b[0]);
+  const ok=saveL();load();
+  $('amsg').textContent=(i>=0?'Fahrzeug '+n+' geändert.':'Fahrzeug '+n+' hinzugefügt.')+(ok?'':' Der Browser speichert nicht dauerhaft.');
+  $('an').value=$('ak').value=$('at').value='';alist();
+};
+$('arst').onclick=()=>{if(sure==='reset'){try{localStorage.removeItem('taxicheck.fahrzeuge')}catch(e){}sure=null;load();$('amsg').textContent='Originalliste wiederhergestellt.';$('arst').textContent='Originalliste wiederherstellen'}else{sure='reset';$('arst').textContent='Wirklich zurücksetzen?'}if(sure!=='reset')alist()};
+stamp();links();render();
+try{if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{})}catch(e){}
+</script>
+
+</body>
+</html>
