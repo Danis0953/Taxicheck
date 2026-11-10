@@ -85,6 +85,23 @@ input::placeholder,textarea::placeholder{color:#7d7863}
 .it span{min-width:0;flex:1 1 180px}
 .it button{background:none;border:2px solid var(--mu);color:var(--wh);font:600 14px var(--display);letter-spacing:.08em;text-transform:uppercase;padding:6px 10px;cursor:pointer}
 .empty{color:var(--mu)}
+.tab.k.w{border-color:var(--ye);color:var(--ye)}
+.tab.k.w[aria-selected=true]{background:var(--ye);color:var(--bk)}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;border:2px solid var(--bk3);margin-top:14px;max-width:100%}
+table.kt{border-collapse:collapse;min-width:780px;width:100%}
+table.kt th{font:600 13px/1.15 var(--display);letter-spacing:.08em;text-transform:uppercase;color:var(--ye);text-align:left;padding:8px 6px;border-bottom:2px solid var(--ye);vertical-align:bottom;background:var(--bk2)}
+table.kt th small{display:block;font:500 11px/1.2 var(--body);letter-spacing:0;text-transform:none;color:var(--mu);margin-top:2px}
+table.kt td{border-bottom:1px solid var(--bk3);border-left:1px solid var(--bk3);padding:0}
+table.kt td.n{font:700 18px var(--display);color:var(--ye);text-align:center;min-width:42px;position:sticky;left:0;background:var(--bk2);border-left:0}
+table.kt th:first-child{position:sticky;left:0;min-width:42px}
+table.kt input,table.kt select{width:100%;min-width:0;background:transparent;color:var(--wh);border:0;border-radius:0;padding:12px 6px;font:500 16px var(--body)}
+table.kt select{appearance:none;-webkit-appearance:none;text-align:center}
+table.kt select option{background:var(--bk2);color:var(--wh)}
+table.kt input:focus,table.kt select:focus{outline:2px solid var(--ye);outline-offset:-2px;background:var(--bk3)}
+table.kt td:nth-child(2){min-width:96px}table.kt td:nth-child(3){min-width:92px}table.kt td:nth-child(4){min-width:200px}table.kt td:nth-child(5),table.kt td:nth-child(6),table.kt td:nth-child(7){min-width:84px}table.kt td:nth-child(8){min-width:240px}
+.khint{color:var(--mu);font-size:14px;margin-top:12px}
+.kts{display:flex;gap:8px;align-items:center}
+.kts span{font:700 22px var(--display);color:var(--ye)}
 button,a,label{touch-action:manipulation;-webkit-tap-highlight-color:rgba(255,204,0,.25)}
 .res .num{font:600 18px var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--wh);opacity:.85;margin-bottom:6px}
 .res .big,.res .sub{overflow-wrap:break-word}
@@ -116,6 +133,7 @@ header small{font-size:12px;text-align:left}
 <div class="tabs" role="tablist">
 <button class="tab" role="tab" id="t1" aria-selected="true" aria-controls="p1">Abfrage</button>
 <button class="tab" role="tab" id="t2" aria-selected="false" aria-controls="p2">Anzeigeformular</button>
+<button class="tab k w" role="tab" id="t4" aria-selected="false" aria-controls="p4">Kontrollliste</button>
 <button class="tab k" role="tab" id="t3" aria-selected="false" aria-controls="p3">Korrektur (Passwort)</button>
 </div>
 
@@ -189,6 +207,29 @@ header small{font-size:12px;text-align:left}
 <div class="saved"><h3>Gespeicherte Kontrollen</h3><div id="lst"></div></div>
 </section>
 
+<section id="p4" role="tabpanel" aria-labelledby="t4" hidden>
+<div class="kfs">
+<h2>TAZ Allgemeine Kontrolle</h2>
+<div class="lab">Datum 2026</div>
+<div class="kts" style="max-width:260px"><input type="text" id="kd1" inputmode="numeric" maxlength="2" placeholder="TT" aria-label="Tag"><span>/</span><input type="text" id="kd2" inputmode="numeric" maxlength="2" placeholder="MM" aria-label="Monat"><span>2026</span></div>
+<div class="g" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr))">
+<div><label for="kb1">Betreuer 1</label><input type="text" id="kb1"></div>
+<div><label for="kb2">Betreuer 2</label><input type="text" id="kb2"></div>
+<div><label for="kb3">Betreuer 3</label><input type="text" id="kb3"></div>
+</div>
+<div class="khint">Bitte Bewertungen von 1 (sehr gut) bis 5 (nicht akzeptabel). Die Tabelle lässt sich seitlich wischen.</div>
+<div class="tw"><table class="kt"><thead id="kth"></thead><tbody id="ktb"></tbody></table></div>
+<div class="g one"><div><label for="kto">E-Mail an</label><input type="text" id="kto" inputmode="email" value="anhoerungen@taxi-auto-zentrale.de"></div></div>
+<div class="btns">
+<a class="btn p" id="kml" href="#">E-Mail</a>
+<button class="btn" type="button" id="kcp">Kopieren</button>
+<button class="btn" type="button" id="knw">Leeren</button>
+</div>
+<div class="msg" id="kmsg" aria-live="polite"></div>
+<div class="count">Die Eingaben bleiben als Entwurf auf diesem Gerät gespeichert.</div>
+</div>
+</section>
+
 <section id="p3" role="tabpanel" aria-labelledby="t3" hidden>
 <div class="kfs" id="lock">
 <h2>Korrektur</h2>
@@ -220,7 +261,7 @@ const V=[[201,"ES-EA 6901","MB E-Klasse"],[202,"ES-EA 6902","Toyota Corolla Hybr
 let M=new Map(),LIST=[];
 function load(){LIST=V.map(x=>x.slice());try{const s=JSON.parse(localStorage.getItem('taxicheck.fahrzeuge')||'null');if(Array.isArray(s))LIST=s}catch(e){}M=new Map(LIST.map(v=>[String(v[0]),v]));$('cnt').textContent=LIST.length+' Fahrzeuge in der Liste'}
 const $=id=>document.getElementById(id);
-function tab(n){for(const i of [1,2,3]){$('t'+i).setAttribute('aria-selected',i===n);$('p'+i).hidden=i!==n}}
+function tab(n){for(const i of [1,2,3,4]){$('t'+i).setAttribute('aria-selected',i===n);$('p'+i).hidden=i!==n}}
 $('t1').onclick=()=>tab(1);$('t2').onclick=()=>{tab(2);if(!$('dat').value)stamp()};
 load();
 function abfrage(){
@@ -331,6 +372,59 @@ $('aadd').onclick=()=>{
   $('an').value=$('ak').value=$('at').value='';alist();
 };
 $('arst').onclick=()=>{if(sure==='reset'){try{localStorage.removeItem('taxicheck.fahrzeuge')}catch(e){}sure=null;load();$('amsg').textContent='Originalliste wiederhergestellt.';$('arst').textContent='Originalliste wiederherstellen'}else{sure='reset';$('arst').textContent='Wirklich zurücksetzen?'}if(sure!=='reset')alist()};
+// Kontrollliste
+const KC=['ord','fahrer','tbk','innen','aussen','fv','bem'];
+const KROWS=21,KR=[['','1','2','3','4','5'],['','Ja','Nein, Hülle vorhanden','Nein, keine Hülle']];
+$('kth').innerHTML='<tr><th>Nr.</th><th>Ordnungs&shy;nummer</th><th>Fahrer NR.</th><th>TBK angebracht<small>wenn nein: Hülle vorhanden?</small></th><th>Sauberkeit innen</th><th>Sauberkeit außen</th><th>Fahrer&shy;verhältnisse</th><th>Bemerkungen<small>z. B. Plakette fehlt</small></th></tr>';
+let kh='';
+for(let r=0;r<KROWS;r++){
+  kh+='<tr><td class="n">'+(r<20?String(r+1).padStart(2,'0'):'+')+'</td>';
+  KC.forEach((c,ci)=>{
+    const id='k_'+r+'_'+c;
+    if(c==='tbk')kh+='<td><select id="'+id+'" aria-label="TBK Zeile '+(r+1)+'">'+KR[1].map(o=>'<option>'+o+'</option>').join('')+'</select></td>';
+    else if(['innen','aussen','fv'].includes(c))kh+='<td><select id="'+id+'" aria-label="'+c+' Zeile '+(r+1)+'">'+KR[0].map(o=>'<option>'+o+'</option>').join('')+'</select></td>';
+    else kh+='<td><input type="text" id="'+id+'" aria-label="'+c+' Zeile '+(r+1)+'"'+(c==='bem'?'':' inputmode="numeric"')+'></td>';
+  });
+  kh+='</tr>';
+}
+$('ktb').innerHTML=kh;
+const KF=['kd1','kd2','kb1','kb2','kb3','kto'];
+function kids(){const a=KF.slice();for(let r=0;r<KROWS;r++)KC.forEach(c=>a.push('k_'+r+'_'+c));return a}
+function ktext(){
+  const v=id=>($(id).value||'').trim();
+  const L=['TAZ Allgemeine Kontrolle '+(v('kd1')||'__')+'/'+(v('kd2')||'__')+' 2026'];
+  const b=[v('kb1'),v('kb2'),v('kb3')].filter(Boolean);
+  L.push('Betreuer: '+(b.join(' / ')||'-'));
+  L.push('Bewertung: 1 (sehr gut) bis 5 (nicht akzeptabel)');L.push('');
+  let n=0;
+  for(let r=0;r<KROWS;r++){
+    const g=c=>v('k_'+r+'_'+c);
+    const p=[];
+    if(g('ord'))p.push('Ordnungsnr. '+g('ord'));
+    if(g('fahrer'))p.push('Fahrer '+g('fahrer'));
+    if(g('tbk'))p.push('TBK: '+g('tbk'));
+    if(g('innen'))p.push('innen '+g('innen'));
+    if(g('aussen'))p.push('außen '+g('aussen'));
+    if(g('fv'))p.push('Fahrerverh. '+g('fv'));
+    if(g('bem'))p.push('Bem.: '+g('bem'));
+    if(p.length){n++;L.push((r<20?String(r+1).padStart(2,'0'):'+')+' | '+p.join(' | '))}
+  }
+  if(!n)L.push('(keine Einträge)');
+  return L.join('\n');
+}
+function klinks(){
+  const t=ktext(),to=($('kto').value||'').trim();
+  $('kml').href='mailto:'+to+'?subject='+encodeURIComponent('Kontrollliste '+($('kd1').value||'')+'/'+($('kd2').value||'')+' 2026')+'&body='+encodeURIComponent(t);
+}
+function ksave(){try{const o={};kids().forEach(id=>{o[id]=$(id).value});localStorage.setItem('taxicheck.kontrollliste',JSON.stringify(o))}catch(e){}}
+try{const o=JSON.parse(localStorage.getItem('taxicheck.kontrollliste')||'null');if(o)kids().forEach(id=>{if(o[id]!==undefined)$(id).value=o[id]})}catch(e){}
+$('p4').addEventListener('input',()=>{klinks();ksave()});$('p4').addEventListener('change',()=>{klinks();ksave()});
+$('t4').onclick=()=>tab(4);
+$('kml').addEventListener('click',()=>{klinks();$('kmsg').textContent='E-Mail-Programm wird geöffnet. Falls nichts passiert, nutze Kopieren.'});
+$('kcp').onclick=async()=>{const t=ktext();try{await navigator.clipboard.writeText(t);$('kmsg').textContent='Text kopiert.'}catch(e){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');$('kmsg').textContent='Text kopiert.'}catch(_){$('kmsg').textContent='Kopieren nicht möglich.'}a.remove()}};
+let ksure=false;
+$('knw').onclick=()=>{if(!ksure){ksure=true;$('knw').textContent='Wirklich leeren?';return}ksure=false;$('knw').textContent='Leeren';kids().forEach(id=>{if(id!=='kto')$(id).value=''});klinks();ksave();$('kmsg').textContent='Kontrollliste geleert.'};
+klinks();
 stamp();links();render();
 try{if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{})}catch(e){}
 </script>
