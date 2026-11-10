@@ -102,6 +102,25 @@ table.kt td:nth-child(2){min-width:96px}table.kt td:nth-child(3){min-width:92px}
 .khint{color:var(--mu);font-size:14px;margin-top:12px}
 .kts{display:flex;gap:8px;align-items:center}
 .kts span{font:700 22px var(--display);color:var(--ye)}
+@media (orientation:landscape) and (min-width:600px){
+.kl .wrap,.kl header .in{max-width:1180px}
+.kl .tabs{grid-template-columns:repeat(4,1fr);margin-top:14px;gap:10px}
+.kl .tab,.kl .tab.k{grid-column:auto;min-height:0;padding:10px 6px;font-size:18px;border-width:3px}
+.kl header{padding-block:8px;border-bottom-width:4px}
+.kl h1{font-size:30px}
+.kl section{margin-top:14px}
+.kl .kfs{padding:12px 14px}
+.kl .kfs h2{font-size:24px;margin-bottom:6px}
+.kl .khint{margin-top:8px}
+.kl table.kt{min-width:0;table-layout:auto}
+.kl table.kt td:nth-child(2){min-width:84px}.kl table.kt td:nth-child(3){min-width:76px}.kl table.kt td:nth-child(4){min-width:150px}
+.kl table.kt td:nth-child(5),.kl table.kt td:nth-child(6),.kl table.kt td:nth-child(7){min-width:64px}
+.kl table.kt td:nth-child(8){min-width:200px}
+.kl table.kt input,.kl table.kt select{padding:8px 6px}
+.kl table.kt th{padding:6px}
+.kl .g{margin-top:8px}
+.kl .btns{grid-template-columns:repeat(4,1fr)}
+}
 button,a,label{touch-action:manipulation;-webkit-tap-highlight-color:rgba(255,204,0,.25)}
 .res .num{font:600 18px var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--wh);opacity:.85;margin-bottom:6px}
 .res .big,.res .sub{overflow-wrap:break-word}
@@ -223,6 +242,7 @@ header small{font-size:12px;text-align:left}
 <div class="btns">
 <a class="btn p" id="kml" href="#">E-Mail</a>
 <button class="btn" type="button" id="kcp">Kopieren</button>
+<button class="btn" type="button" id="kql">Querformat</button>
 <button class="btn" type="button" id="knw">Leeren</button>
 </div>
 <div class="msg" id="kmsg" aria-live="polite"></div>
@@ -261,7 +281,7 @@ const V=[[201,"ES-EA 6901","MB E-Klasse"],[202,"ES-EA 6902","Toyota Corolla Hybr
 let M=new Map(),LIST=[];
 function load(){LIST=V.map(x=>x.slice());try{const s=JSON.parse(localStorage.getItem('taxicheck.fahrzeuge')||'null');if(Array.isArray(s))LIST=s}catch(e){}M=new Map(LIST.map(v=>[String(v[0]),v]));$('cnt').textContent=LIST.length+' Fahrzeuge in der Liste'}
 const $=id=>document.getElementById(id);
-function tab(n){for(const i of [1,2,3,4]){$('t'+i).setAttribute('aria-selected',i===n);$('p'+i).hidden=i!==n}}
+function tab(n){for(const i of [1,2,3,4]){$('t'+i).setAttribute('aria-selected',i===n);$('p'+i).hidden=i!==n}document.body.classList.toggle('kl',n===4)}
 $('t1').onclick=()=>tab(1);$('t2').onclick=()=>{tab(2);if(!$('dat').value)stamp()};
 load();
 function abfrage(){
@@ -420,6 +440,12 @@ function ksave(){try{const o={};kids().forEach(id=>{o[id]=$(id).value});localSto
 try{const o=JSON.parse(localStorage.getItem('taxicheck.kontrollliste')||'null');if(o)kids().forEach(id=>{if(o[id]!==undefined)$(id).value=o[id]})}catch(e){}
 $('p4').addEventListener('input',()=>{klinks();ksave()});$('p4').addEventListener('change',()=>{klinks();ksave()});
 $('t4').onclick=()=>tab(4);
+$('kql').onclick=async()=>{
+  const m=$('kmsg');
+  try{if(document.documentElement.requestFullscreen&&!document.fullscreenElement)await document.documentElement.requestFullscreen()}catch(e){}
+  try{await screen.orientation.lock('landscape');m.textContent='Querformat aktiv.'}
+  catch(e){m.textContent='Bitte das Handy ins Querformat drehen und die Bildschirmdrehung einschalten.'}
+};
 $('kml').addEventListener('click',()=>{klinks();$('kmsg').textContent='E-Mail-Programm wird geöffnet. Falls nichts passiert, nutze Kopieren.'});
 $('kcp').onclick=async()=>{const t=ktext();try{await navigator.clipboard.writeText(t);$('kmsg').textContent='Text kopiert.'}catch(e){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');$('kmsg').textContent='Text kopiert.'}catch(_){$('kmsg').textContent='Kopieren nicht möglich.'}a.remove()}};
 let ksure=false;
